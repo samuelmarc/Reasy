@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reasy</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4 text-primary">Reasy</h2>
+        <div id="pwa-container" class="fixed-bottom p-3 d-none" style="z-index: 2000;">
+            <div class="container">
+                <button id="bt-instalar" class="btn btn-primary btn-lg w-100 shadow-lg fw-bold border-light">
+                    Instalar App Reasy 📲
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label">Território №</label>
+                        <input type="number" id="numTerritorio" class="form-control" placeholder="Ex: 12">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Quadra</label>
+                        <input type="text" id="quadra" class="form-control" placeholder="Ex: A">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Publicadores</label>
+                        <input type="text" id="publicadores" class="form-control"
+                            placeholder="Nomes dos publicadores...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">Nova Visita</div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <label class="form-label">Local / Nome / Comércio</label>
+                    <input type="text" id="localNome" class="form-control" placeholder="№ da casa ou nome">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Data</label>
+                    <input type="date" id="dataVisita" class="form-control">
+                </div>
+                <button id="btnAdicionar" class="btn btn-primary w-100">Adicionar à Lista</button>
+            </div>
+        </div>
+
+        <div id="listaRegistros" class="mb-4"></div>
+
+        <div class="d-grid gap-2 mb-5">
+            <button id="btnExportar" class="btn btn-success btn-lg shadow">Exportar para Word (.docx)</button>
+            <button id="btnLimpar" class="btn btn-outline-danger btn-sm">Limpar Relatório Atual</button>
+        </div>
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/docx/index.iife.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        $(function() {
+            let promptInstalacao;
+            const $container = $('#pwa-container');
+            const $btn = $('#bt-instalar');
+
+            $(window).on('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                promptInstalacao = e.originalEvent;
+                $container.removeClass('d-none').hide().fadeIn();
+            });
+
+            $btn.on('click', async function() {
+                if (!promptInstalacao) return;
+
+                promptInstalacao.prompt();
+                const { outcome } = await promptInstalacao.userChoice;
+                
+                if (outcome === 'accepted') {
+                    $container.fadeOut();
+                }
+                promptInstalacao = null;
+            });
+
+            if ('serviceWorker' in navigator) {
+                $(window).on('load', function() {
+                    navigator.serviceWorker.register('/js/sw.js')
+                        .then(reg => console.log('SW ok'))
+                        .catch(err => console.log('SW erro', err));
+                });
+            }
+
+            $(window).on('appinstalled', function() {
+                $container.fadeOut();
+            });
+        });
+    </script>
+</body>
+</html>
