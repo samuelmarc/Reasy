@@ -1,14 +1,15 @@
-const CACHE_NAME = 'v2-cache-public';
+const CACHE_NAME = 'v3-cache-public';
 
 const ASSETS = [
   '/',
   '/index.html',
+  '/icon-512.png',
   '/manifest.json',
   '/js/app.js',
   '/js/bootstrap.bundle.min.js',
   '/js/docx/index.iife.js',
   '/js/jquery.min.js',
-  '/css/bootstrap.min.css'
+  '/css/bootstrap.min.css',
 ];
 
 self.addEventListener('install', (event) => {
