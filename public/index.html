@@ -100,6 +100,14 @@
             $(window).on('appinstalled', function() {
                 $container.fadeOut();
             });
+
+            $(function() {
+                const buttons = $("button");
+                buttons.forEach(btn => {
+                    btn.removeAttribute('disabled');
+                    btn.classList.remove('disabled');
+                });
+            })
         });
     </script>
 </body>
