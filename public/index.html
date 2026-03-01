@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reasy</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -61,53 +62,46 @@
         </div>
     </div>
 
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/docx/index.iife.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/docx/index.iife.js"></script>
+    <script src="js/app.js"></script>
     <script>
-        $(function() {
+        $(function () {
             let promptInstalacao;
             const $container = $('#pwa-container');
             const $btn = $('#bt-instalar');
 
-            $(window).on('beforeinstallprompt', function(e) {
+            $(window).on('beforeinstallprompt', function (e) {
                 e.preventDefault();
                 promptInstalacao = e.originalEvent;
                 $container.removeClass('d-none').hide().fadeIn();
             });
 
-            $btn.on('click', async function() {
+            $btn.on('click', async function () {
                 if (!promptInstalacao) return;
-
                 promptInstalacao.prompt();
                 const { outcome } = await promptInstalacao.userChoice;
-                
-                if (outcome === 'accepted') {
-                    $container.fadeOut();
-                }
+                if (outcome === 'accepted') $container.fadeOut();
                 promptInstalacao = null;
             });
 
             if ('serviceWorker' in navigator) {
-                $(window).on('load', function() {
-                    navigator.serviceWorker.register('/sw.js')
-                        .then(reg => console.log('SW ok'))
-                        .catch(err => console.log('SW erro', err));
-                });
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => {
+                        reg.onupdatefound = () => {
+                            const sw = reg.installing;
+                            sw.onstatechange = () => {
+                                if (sw.state === 'installed' && navigator.serviceWorker.controller) location.reload();
+                            };
+                        };
+                    })
+                    .catch(err => console.log('SW erro', err));
             }
 
-            $(window).on('appinstalled', function() {
-                $container.fadeOut();
-            });
+            $(window).on('appinstalled', () => $container.fadeOut());
 
-            $(function() {
-                const buttons = $("button");
-                buttons.forEach(btn => {
-                    btn.removeAttribute('disabled');
-                    btn.classList.remove('disabled');
-                });
-            })
+            $("button").prop('disabled', false).removeClass('disabled');
         });
     </script>
 </body>
